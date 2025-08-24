@@ -1,0 +1,447 @@
+---
+title: "Personality-analysis"
+date: "2025-06-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Khai báo Thư viện**
+```{r}
+library(reshape2)
+library(ggplot2)
+```
+
+
+**Đọc dữ liệu**
+```{r}
+data <- read.csv("E:/Học Tập/Đại Học/Năm 4 HK 2 2024-2025/thống kê nhiều chiều/thong_ke_chieu_chieu/PROJECT/DATA/personality_synthetic_dataset.csv", header = TRUE, stringsAsFactors = TRUE)
+```
+
+**Thông tin tổng quan của bộ dữ liệu**
+```{r}
+head(data, 10)
+```
+
+```{r}
+# Kiểm tra số chiều của dữ liệu
+dim(data)
+```
+Bộ dữ liệu tổng hợp này được thiết kế để mô phỏng các loại tính cách của con người — Hướng nội, Hướng ngoại và cả người có cả hướng ngoại lẫn hướng nội — dựa trên nhiều đặc điểm hành vi và tâm lý khác nhau. 
+
+Bộ dữ liệu này chứa 20.000 mục nhập và 30 cột, bao gồm 29 đặc điểm số biểu thị các chỉ số tính cách và 1 cột nhãn (personality_type).
+
+Trong đó
+
+- personality_type: biến mục tiêu gồm 3 kiểu tính cách: Introvert(hướng nội), Extrovert(hướng ngoại), or Ambivert (hỗn hợp).
+
+- social_energy:	Xu hướng đón nhận năng lượng từ tương tác xã hội (0–10).
+
+- alone_time_preference: thể hiện sự thoải mái với sự cô đơn.
+
+- talkativeness: Xu hướng tham gia và các cuộc trò chuyện.
+
+- deep_reflection: Tần suất suy nghĩ sâu hoặc suy nghĩ nội tâm.
+
+- group_comfort: Dễ hoà nhập với các nhóm/ hội.
+
+- party_liking: Sự thích thú đối với các bữa tiệc và các sự kiện.
+
+- listening_skill: Khả năng lắng nghe
+
+- empathy: khả năng đồng cảm hay thấu hiểu cảm xúc của người khác.
+
+- creativity: sự tư duy sáng tạo.
+
+- organization: Mức độ ưu tiên cho các trật tự, kế hoạch.
+
+- leadership: Sự thoải mái khi làm lãnh đạo.
+
+- risk_taking: Sự chấp nhận rủi ro.
+
+- public_speaking_comfort: Mức độ thoải mái khi nói chuyện trước đám đông hoặc công chúng.
+
+- curiosity: Mức độ thích học tập và khám phá những cái mới.
+
+- routine_preference: Thể hiện thói quen và sự tự phát.
+
+- excitement_seeking: Mức độ mong muốn những trải nghiệm mới mẻ.
+
+- friendliness: Mức độ thân thiện.
+
+- emotional_stability: Khả năng kiểm soát và cân bằng khi căng thẳng.
+
+- planning: Xu hướng lập kế hoạch từ trước.
+
+- spontaneity: Hành động tự phát không có kế hoạch từ trước.
+
+- adventurousness: Sẵn sàng thử những hoạt động mới và mạo hiểm.
+
+- reading_habit: Tần suất đọc sách báo.
+
+- sports_interest: Mức độ quan tâm tới thể thao hoặc các hoạt động thể chất.
+
+- online_social_usage: Thời gian dành cho mạng xã hội.
+
+- travel_desire: Sở thích du lịch và khám phá những địa điểm mới.
+
+- gadget_usage: Tần suất sử dụng các thiết bị công nghệ và tiện ích.
+
+- work_style_collaborative: mức độ làm việc nhóm so với với việc làm cá nhân.
+
+- decision_speed: Thời gian đưa ra các quyết định.
+
+- stress_handling: Khả năng quản lý căng thẳng cách hiệu quả.
+
+
+**Khảo sát dữ liệu**
+```{r}
+str(data)
+```
+Nhận xét: Các biến đều có giá trị numeric. Chỉ có biến "personality_type" là biến mục tiêu.
+
+
+```{r}
+summary(data)
+```
+Nhận xét: Ta thấy bộ dữ liệu này khảo sát với số lượng người thuộc từng nhóm ~ nhau:
+ 
+- Ambivert :6573 
+ 
+- Extrovert:6857 
+ 
+- Introvert:657
+
+Các biến còn lại đều là thang đo từ 1-10.
+
+
+**Kiểm tra giá trị bị thiếu**
+```{r}
+missing_values <- colSums(is.na(data))
+print(missing_values)
+```
+Nhận xét: Bộ dữ liệu không có giá trị nào bị thiếu.
+
+**Ta lấy các cột biến để thực hiện PCA (trừ biến personality_type) **
+```{r}
+numeric_data <- data[, -1]
+```
+
+
+**Vẽ boxplot**
+```{r}
+boxplot(numeric_data, main = "Boxplot Before Outlier Removal", las = 2, col = "skyblue")
+```
+Nhận xét: Ta nhận thấy có các giá trị ngoại lai ở một số biến.
+
+
+**Kiểm tra giá trị ngoại lai và tiến hành xử lý**
+
+Vì đây là bộ dữ liệu nhiều chiều nên không thể sử dụng IQR để xác định các giá trị ngoại lai mà cần sử dụng khoảng cách Mahalanobis để xác định các giá trị ngoại lai.
+```{r}
+mahalanobis_distance <- mahalanobis(numeric_data, colMeans(numeric_data), cov(numeric_data))
+cutoff_value <- qchisq(0.95, df = ncol(numeric_data)) # 95% quantile for chi-square distribution
+outliers <- which(mahalanobis_distance > cutoff_value)
+```
+
+In số lượng ngoại lai và tính tỉ lệ ngoại lai trong bộ dữ liệu
+```{r}
+cat("số lượng ngoại lai:", length(outliers), "\n")
+cat("Tỷ lệ ngoại lai:", length(outliers)/nrow(data)*100, "%", "\n")
+```
+Nhận xét: có 821 giá trị ngoại lai chiếm 4,105% giá trị quan trắc bộ dữ liệu. Vì số lượng ngoại lai không lớn nên ta tiến hành loại bỏ các giá trị này.
+
+Loại bỏ các giá trị ngoại lai.
+```{r}
+data_no_outliers <- numeric_data[-outliers, ]
+```
+
+
+Vẽ lại boxplot sau khi loại bỏ các giá trị ngoại lai
+```{r}
+boxplot(data_no_outliers, main = "Boxplot After Outlier Removal", las = 2, col = "skyblue")
+```
+Nhận xét: mặc dù có thể thấy vẫn còn nhiều giá trị ngoại lai, nhưng đã có thể nhìn thấy các đặc trưng của bộ dữ liệu
+
+Kiểm tra lại bộ dữ liệu sau khi loại bỏ giá trị ngoại lai
+```{r}
+nrow(data_no_outliers)
+```
+Nhận xét: còn 19,179 quan trắc
+
+
+Thực hiện PCA trên bộ dữ liệu 
+```{r}
+pca_result <- prcomp(data_no_outliers, scale. = TRUE)
+```
+
+
+Hiển thị kết quả PCA.
+```{r}
+summary(pca_result)
+```
+Nhận xét:
+
+- Theo nguyên tắc Kaiser, nên giữ lại 3 thành phần chính (PC1, PC2, PC3), vì chỉ các thành phần này có trị riêng lớn hơn 1.
+
+- Ba thành phần chính đầu tiên thoả nguyên tắc Kaiser tỉ lệ phương sai đóng góp là 48,596%
+
+- Ta thấy từ thành phần chính thứ nhất (PC1) chiếm 41,62% tỉ lệ phương sai, chiếm phần lớn biến động
+
+- Nhưng từ thành phần chính thứ 2 trở đi thì tỉ lệ đóng góp phương sai giảm mạnh chỉ còn dưới 4%. Ta có thể suy đoán từ thành phần chính thứ 2 sẽ có các đóng góp vào phương sai của bộ dữ liệu là rất nhỏ. Dựa vào tỉ lệ đóng góp phương sai có thể nhận 2 thành phần chính là PC1 và PC2 bỏ qua nguyên tắc Kaiser
+
+
+```{r}
+# Scree plot
+# Custom scree plot using ggplot2
+pca_variance <- data.frame(
+  PC = 1:length(pca_result$sdev),
+  Variance = pca_result$sdev^2 / sum(pca_result$sdev^2) * 100
+)
+p3 <- ggplot(pca_variance, aes(x = PC, y = Variance)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Scree Plot", x = "Principal Components", y = "Percentage of Variance Explained (%)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 14))
+
+# Display scree plot
+print(p3)
+```
+
+Nhận xét: 
+
+- PC1: Giải thích khoảng 40% phương sai.
+
+- PC2 từ trở đi: Giảm mạnh xuống dưới mức 4% phương sai, đồ thị bắt đầu thoải ra. Phù hợp với nhận định ở trên là chỉ nên giữ lại 2 thành phần chính là PC1 và PC2.
+
+- Điểm elbow có thể xác định là điểm PC2.
+
+
+Bảng giá trị Loading của bộ dữ liệu.
+```{r}
+pca_loadings <- pca_result$rotation
+print("PCA Loadings:")
+print(pca_loadings)
+```
+
+- PC1 (Thành phần chính đầu tiên)
+
+Biến đóng góp lớn (tuyệt đối > 0.3):
+
+social_energy: -0.2354584797 (âm, liên quan ngược).
+
+alone_time_preference: 0.237749517 (dương, ưa thích thời gian một mình).
+
+talkativeness: -0.2372408347 (âm, ít nói chuyện).
+
+deep_reflection: 0.2161623835 (dương, suy ngẫm sâu).
+
+group_comfort: -0.2195160341 (âm, không thoải mái trong nhóm).
+
+party_liking: -0.2493799053 (âm, không thích tiệc tùng).
+
+listening_skill: 0.1468725243 (dương, nhẹ, kỹ năng lắng nghe).
+
+Nhận xét: PC1 dường như đại diện cho xu hướng hướng nội (introversion) so với hướng ngoại (extraversion). Các biến như ưa thích thời gian một mình, suy ngẫm sâu, và không thoải mái trong nhóm có tải dương, trong khi năng lượng xã hội, nói chuyện, và thích tiệc tùng có tải âm.
+
+
+- PC2 (Thành phần chính thứ hai)
+
+Biến đóng góp lớn:
+
+empathy: 0.59369963 (dương, rất mạnh, đồng cảm).
+
+creativity: 0.5966071 (dương, sáng tạo).
+
+organization: -0.006812303 (gần 0, không ảnh hưởng).
+
+leadership: 0.00393648 (gần 0, không ảnh hưởng).
+
+risk_taking: -0.0163788 (gần 0).
+
+Nhận xét: PC2 có thể đại diện cho khả năng cảm xúc và sáng tạo. Biến empathy và creativity có tải rất cao, trong khi các biến liên quan đến tổ chức hoặc rủi ro gần như không ảnh hưởng.
+
+Kết luận: Dựa trên ma trận tải, chỉ 2 PC đầu tiên có các giá trị tải đáng kể (> 0.3 hoặc < -0.3) trên một số biến. Điều này phù hợp với phân tích Scree Plot (giữ 2 thành phần đầu).
+
+
+```{r}
+# View PCA scores (optional)
+pca_scores <- pca_result$x
+head(pca_scores)
+```
+
+- PC1 (Thành phần chính đầu tiên)
+
+Quan sát nổi bật:
+
+Dòng 1: -4.95088554 (rất âm, nổi bật ở hướng ngược).
+
+Dòng 2: 0.01836153 (gần 0, trung bình).
+
+Dòng 3: 0.43470228 (dương nhẹ).
+
+Dòng 5: 3.37129356 (rất dương, nổi bật ở hướng thuận).
+
+Nhận xét: PC1 có biên độ lớn (-4.95 đến 3.37), phản ánh sự khác biệt mạnh giữa các quan sát. Dựa trên ma trận tải trước, PC1 liên quan đến hướng nội/hướng ngoại, nên các quan sát như dòng 1 (âm) có thể nghiêng về hướng ngoại, trong khi dòng 5 (dương) nghiêng về hướng nội.
+
+- PC2 (Thành phần chính thứ hai)
+
+Quan sát nổi bật:
+
+Dòng 1: 0.5999770 (dương nhẹ).
+
+Dòng 3: -1.5505420 (âm, nổi bật).
+
+Dòng 5: -1.7210118 (âm, nổi bật).
+
+Nhận xét: PC2 có biên độ từ -1.72 đến 0.60, liên quan đến cảm xúc/sáng tạo (theo ma trận tải). Quan sát dòng 3 và 5 có xu hướng thấp về đồng cảm/sáng tạo, trong khi dòng 1 cao hơn.
+
+
+```{r}
+# Loading plot for PC1 and PC2 with arrows
+pca_loadings <- as.data.frame(pca_result$rotation[, 1:2]) # Extract loadings for PC1 and PC2
+pca_loadings$variable <- rownames(pca_loadings)
+
+# Scale loadings for better visualization (optional, adjust multiplier as needed)
+pca_loadings$PC1 <- pca_loadings$PC1 * 5
+pca_loadings$PC2 <- pca_loadings$PC2 * 5
+
+p4 <- ggplot() +
+  geom_segment(data = pca_loadings, aes(x = 0, y = 0, xend = PC1, yend = PC2), 
+               arrow = arrow(length = unit(0.2, "cm")), color = "red") +
+  geom_text(data = pca_loadings, aes(x = PC1, y = PC2, label = variable), 
+            vjust = 1.5, hjust = 0.5, size = 3, color = "red") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
+  labs(title = "Loading Plot with Arrows (PC1 vs PC2)", x = "PC1 Loadings", y = "PC2 Loadings") +
+  theme(plot.title = element_text(hjust = 0.5, size = 14)) +
+  xlim(-1, 1) + ylim(-1, 1) # Adjust limits based on scaled loadings
+
+# Display loading plot
+print(p4)
+```
+Nhận xét:
+
+Biến có tải lớn trên PC1 (hướng ngang)
+
+Biến âm (bên trái, PC1 < 0):
+
+social_energy, talkativeness, party_liking, group_comfort: Các biến này có tải âm trên PC1, gợi ý PC1 phân biệt hướng ngoại (âm) so với hướng nội (dương). Những người có giá trị âm trên PC1 có xu hướng năng động xã hội.
+
+Biến dương (bên phải, PC1 > 0):
+
+alone_time_preference, deep_reflection: Các biến này có tải dương, liên quan đến xu hướng hướng nội, ưa thích thời gian một mình và suy ngẫm sâu.
+
+Biến có tải lớn trên PC2 (hướng dọc)
+
+Biến dương (trên, PC2 > 0):
+
+curiosity, empathy, planning, listening_skill, organization, routine_preference: Các biến này có tải dương trên PC2, cho thấy PC2 có thể liên quan đến khả năng cảm xúc (empathy), tổ chức (planning, organization), và sự tò mò (curiosity).
+
+Biến âm (dưới, PC2 < 0):
+
+Ít biến nổi bật ở phía âm, nhưng một số như decision_speed có thể có tải nhẹ âm.
+
+Biến có độ dài mũi tên lớn
+
+curiosity, empathy, planning: Có mũi tên dài, cho thấy chúng đóng góp mạnh vào sự phân biệt giữa PC1 và PC2.
+
+social_energy, alone_time_preference: Cũng có độ dài đáng kể, nhấn mạnh vai trò của chúng trong PC1.
+
+Ý nghĩa: PC1 chủ yếu phân biệt hướng nội (introversion) và hướng ngoại (extraversion), trong khi PC2 liên quan đến khả năng cảm xúc, tổ chức, và tò mò. Điều này phù hợp với ma trận tải trước.
+
+```{r}
+# Score plot for PC1 and PC2 with personality_type
+# Keep personality_type and sync with outliers
+personality_types <- data$personality_type  # Get personality_type from original data
+personality_types_no_outliers <- personality_types[-outliers]  # Remove outliers
+
+pca_scores <- as.data.frame(pca_result$x)
+pca_scores$personality_type <- personality_types_no_outliers  # Assign synced personality types
+
+p5 <- ggplot(pca_scores, aes(x = PC1, y = PC2, color = personality_type)) +
+  geom_point(alpha = 0.5) +
+  labs(title = "Score Plot (PC1 vs PC2) by Personality Type", 
+       x = "PC1", y = "PC2", color = "Personality Type") +
+  theme(plot.title = element_text(hjust = 0.5, size = 14)) +
+  scale_color_discrete(name = "Personality Type")
+
+# Display score plot
+print(p5)
+```
+
+Nhận xét:
+
+Phân biệt rõ ràng: PC1 phân biệt tốt ba nhóm tính cách:
+
+Extravert (âm) vs Introvert (dương), với Ambivert ở giữa, xác nhận PC1 là trục hướng nội/hướng ngoại.
+
+PC2 không phân biệt rõ ràng giữa các nhóm, nhưng cho thấy sự đa dạng nội bộ (ví dụ: Introvert có điểm cao trên PC2 có thể liên quan đến tò mò).
+
+Độ chồng lấn: Có một số chồng lấn giữa Ambivert và hai nhóm còn lại, đặc biệt ở vùng PC1 gần 0, phản ánh tính chất trung gian của Ambivert.
+
+Phân bố đều: Mỗi nhóm có số lượng quan sát đáng kể, với Extravert và Introvert có biên độ rộng hơn, trong khi Ambivert tập trung hơn.
+
+
+Trước khi phân tích nhân tố thì bộ dữ liệu xét phải được chuẩn hóa,
+nhưng hiện tại bộ dữ liệu chưa được scale nên ta thực hiện scale lại:
+
+```{r}
+data_sc <- scale(data_no_outliers, scale = T)
+boxplot(data_sc)
+```
+
+**Nhận xét:** Bộ dữ liệu đã được chuẩn hóa, ta có thể tiến hành phân
+tích nhân tố FA
+
+```{r}
+fa.dat <- factanal(data_sc , factors = 2)
+fa.dat
+```
+
+**Nhận xét:** với giá trị p_value = 0.149 \> 0.05 chứng tỏ không đủ cơ
+sở bác bỏ việc phân tích dựa trên 2 nhân tố là không thể hiện đầy đủ
+thông tin của bộ dữ liệu. Vì vậy ta nhận việc phân tích bộ dữ liệu dựa
+trên 2 nhân tố.
+
+**KIỂM TRA ĐỘ CUNG CẤP THÔNG TIN CHO NHÂN TỐ**
+
+```{r}
+round(1 - fa.dat$uniquenesses,3)
+```
+
+**Nhận xét:**
+
+-   đây là các biến có hệ số lớn, có nghĩa chúng chia sẻ rất nhiều phương sai của nó với các biến khác: social_energy,alone_time_preference, talkativeness, deep_reflection , group_comfort, party_liking, leadership, risk_taking, public_speaking_comfort, excitement_seeking, adventurousness. reading_habit.
+
+- nhưng có một số biến gần như bằng 0 như là stress_handling, creativity, emotional_stability,empathy. gần như chúng không chia sẻ bất cứ một thông tin nào. vì có sự chênh lệch như vậy nên ta sẽ thử xoay nhân tố theo "varimax" xem thử có thay đổi chút gì được không.
+
+```{r}
+fa.dat <- factanal(data_sc, factors = 2)
+fa.dat
+```
+```{r}
+round(1 - fa.dat$uniquenesses,3)
+```
+**Nhận xét:** Sau khi xoay ta cũng không nhận lại được gì nhiều thay đổi nên vì vậy ta sẽ phân tích hệ số tải của FA luôn.
+
+```{r}
+fa.dat$loadings
+```
+**Nhận xét:**
+
+- Ở factor 1:
+  - các biến có hệ số lớn hơn 0 như là: social_energy,talkativeness,group_comfort, party_liking, leadership,risk_taking,public_speaking_comfort,curiosity, excitement_seeking,friendliness ,spontaneity, adventurousness,sports_interest ,online_social_usage, travel_desire,gadget_usage, work_style_collaborative, decision_speed
+  - Các biến có hệ số < 0: alone_time_preference, deep_reflection, listening_skill, empathy, organization, routine_preference, routine_preference, planning, reading_habit, stress_handling
+  => đây là những tính cách thể hiện một người có tính cách hương ngoại và đối lập với điều đó là một người hướng nội
+Từ đây ta có thể thấy factor 1 chính là đại diện nhân tố của một người hương ngoại và để dễ dàng nhận biết và phân biệt với một người hướng nội
+
+- Ở Factor 2:
+  - Biến có hệ số >0: group_comfort, friendliness
+  - Biến có hệ số <0: deep_reflection, planning
+  => Đây là nhóm tính cách vừa có một chút của hướng ngoại là thoải mái trong nhóm, thân thiện nhưng cũng có chút của hương nội là suy nghĩ nội tâm, lập kế hoạch.
+Từ đây ta có thế thấy factor 2 chính là nhân tố ẩn của một người khi họ vừa có chút tính cách hướng ngoại vừa có chút tính cách hướng nội hay còn gọi với một cái tên là Ambiver (người trung tính), là sự kết hợp giữa một chút hướng ngoại một chút hướng nội: đây là người có sự hòa đồng, thân thiện nhưng lại có cái nhìn rất sâu sắc đôi khi và bộ dữ liệu đã thể hiện đây là một người vừa có yếu tố xã hội vừa có yếu tố nội tâm. mặc ù là hệ số của cả 4 biến không quá cao nhưng đâu đó ta có thể nhận dạng được sự pha trộn này.
+
+**Kết luận:** Từ bộ dữ liệu ta đã nhận dạng được một cách rõ ràng của người hướng nội và hướng ngoại, nhưng phải qua phân tích nhân tố FA mà ta thấy rõ được một tính cách tiềm ẩn của một người trung tính là sự kết hợp một chút hướng ngoại và một chút hướng nội thông qua 2 yếu tố là xã hội và nội tâm.
