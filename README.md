@@ -1,7 +1,7 @@
 # Các yếu tố ảnh hưởng đến phân loại người hướng ngoại, hướng nội
 --
 ## Mục lục
-* [1. Giới thiệu](##-Giới-thiệu)
+* [1. Giới thiệu](#-Giới-thiệu)
 * [2. Tiền xử lý dữ liệu](##-Tiền-xử-lý-dữ-liệu)
   * [2.1. Đọc và kiểm tra dữ liệu](###-Đọc-và-kiểm-tra-dữ-liệu)
   * [2.2. Kiểm tra và xử lý ngoại lai]
