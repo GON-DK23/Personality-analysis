@@ -1,26 +1,25 @@
 # Các yếu tố ảnh hưởng đến phân loại người hướng ngoại, hướng nội
---
+
 ## Mục lục
-* [1. Giới thiệu](#-Giới-thiệu)
-* [2. Tiền xử lý dữ liệu](##-Tiền-xử-lý-dữ-liệu)
-  * [2.1. Đọc và kiểm tra dữ liệu](###-Đọc-và-kiểm-tra-dữ-liệu)
-  * [2.2. Kiểm tra và xử lý ngoại lai]
-* [3. Phân tích thành phần chính - PCA]
-  * [3.1. Kết quả PCA]
-  * [3.2. Biểu đồ Scree Plot]
-  * [3.3. Bảng Loadings]
-  * [3.4. PCA Score]
-  * [3.5. Plot Score for PC1 and PC2]
-* [4. Phân tích Nhân Tố - FA]
-  * [4.1. Kết quả Phân tích nhân tố]
-  * [4.2. Kiểm tra độ cung cấp thông tin của nhân tố]
-  * [4.3. Hệ số Loangdings]
-* [5. Đánh giá các phương pháp]
-  * [5.1. So sánh các phương pháp]
-  * [5.2. Diễn giải kết quả]
-  * [5.3. Nhận xét]
-* [6. Kết luận]
-## Giới thiệu
+* [1. Giới thiệu](#giới-thiệu)
+* [2. Tiền xử lý dữ liệu](#tiền-xử-lý-dữ-liệu)
+  * [2.1. Đọc và kiểm tra dữ liệu](#đọc-và-kiểm-tra-dữ-liệu)
+  * [2.2. Kiểm tra và xử lý giá trị ngoại lai](#kiểm-tra-và-xử-lý-giá-trị-ngoại-lai)
+* [3. Phân tích thành phần chính - PCA](#phân-tích-thành-phần-chính)
+  * [3.1. Kết quả PCA](#kết-quả-pca)
+  * [3.2. Biểu đồ Scree Plot](#score-plot-for-pc1-and-pc2) <!-- nếu bạn có phần vẽ scree plot thì sửa lại -->
+  * [3.3. Bảng Loadings](#bảng-loadings)
+  * [3.4. PCA Score](#pca-score)
+  * [3.5. Score plot for PC1 and PC2](#score-plot-for-pc1-and-pc2)
+* [4. Phân tích Nhân Tố - FA](#phân-tích-nhân-tố)
+  * [4.1. Kết quả Phân tích nhân tố](#kết-quả-phân-tích-nhân-tố)
+  * [4.2. Kiểm tra độ cung cấp thông tin của nhân tố](#kiểm-tra-độ-cung-cấp-thông-tin-của-nhân-tố)
+  * [4.3. Hệ số tải](#hệ-số-tải)
+* [5. Đánh giá các phương pháp](#đánh-giá-các-phương-pháp)
+  * [5.1. So sánh các phương pháp](#so-sánh-các-phương-pháp)
+  * [5.2. Diễn giải kết quả](#diễn-giải-kết-quả)
+  * [5.3. Nhận xét](#nhận-xét)
+* [6. Kết luận](#kết-luận)
 
 - Bộ dữ liệu: [Introvert, Extrovert & Ambivert Classification](https://www.kaggle.com/datasets/miadul/introvert-extrovert-and-ambivert-classification) (Bộ dữ liệu đặc điểm tính cách tổng hợp: Phân loại hướng nội, hướng ngoại và ambivert) thu thập từ Kaggle, bộ dữ liệu tổng hợp này được thiết kế để mô phỏng các loại tính cách của con người — Hướng nội, Hướng ngoại và cả người có cả hướng ngoại lẫn hướng nội — dựa trên nhiều đặc điểm hành vi và tâm lý khác nhau.
 - Bộ dữ liệu này chứa 20.000 mục nhập và 30 cột, bao gồm 29 đặc điểm số biểu thị các chỉ số tính cách và 1 cột nhãn (personality\_type).
@@ -328,5 +327,3 @@ Phân tích nhân tố (FA): FA với hai nhân tố cho thấy:
 - Phức tạp trong giải thích FA: Việc xác định và giải thích nhân tố có thể phức tạp khi một số biến có đóng góp yếu.
 
 - Hạn chế của PC2: PC2 không phân biệt rõ ràng giữa các nhóm, làm giảm giá trị giải thích của nó.
-
-\newpage
