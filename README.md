@@ -1,95 +1,80 @@
-# 🧑‍🤝‍🧑 Phân tích và phân loại tính cách (Personality Analysis)
+# 🧑‍🤝‍🧑 Phân tích tính cách (Personality Analysis)
 
 ## 📌 Giới thiệu
-Dự án này tập trung vào việc **phân tích dữ liệu tính cách** của con người dựa trên bộ dữ liệu khảo sát tâm lý.  
-Mục tiêu chính:
-- Khám phá và trực quan hóa dữ liệu
-- Tìm hiểu mối quan hệ giữa các đặc điểm tính cách
-- Áp dụng các thuật toán học máy để phân loại nhóm tính cách
-- Đánh giá hiệu quả các mô hình dự đoán
+Dự án này tập trung vào việc **phân tích đặc điểm tính cách con người** dựa trên dữ liệu khảo sát tâm lý, và áp dụng các **phương pháp thống kê** cùng **mô hình học máy** để phân loại nhóm tính cách.  
+Quy trình bao gồm: **tiền xử lý dữ liệu, phân tích khám phá (EDA), phân tích thành phần chính (PCA)** và xây dựng các mô hình trong **R**.
 
 ---
 
-## 📂 Bộ dữ liệu
-Bộ dữ liệu gồm nhiều biến liên quan đến đặc điểm cá nhân và hành vi, ví dụ:
-- **Gender**: Giới tính  
-- **Age**: Tuổi  
-- **Openness**: Tính cởi mở  
-- **Neuroticism**: Tính dễ bị căng thẳng  
-- **Conscientiousness**: Tính tận tâm  
-- **Agreeableness**: Tính dễ chịu  
-- **Extraversion**: Tính hướng ngoại  
-- **Personality Type**: Nhãn phân loại (`Extravert`, `Introvert`, …)
+## 📂 Dữ liệu
+Bộ dữ liệu gồm thông tin nhân khẩu học và các đặc điểm tâm lý:
+- **Gender** – giới tính  
+- **Age** – tuổi  
+- **Openness, Neuroticism, Conscientiousness, Agreeableness, Extraversion** – 5 yếu tố tính cách (Big Five)  
+- **Personality Type** – nhãn phân loại (ví dụ: Introvert, Extravert)
 
 ---
 
-## 🛠️ Các bước xử lý
+## 🛠️ Quy trình
 1. **Tiền xử lý dữ liệu**
-   - Kiểm tra dữ liệu thiếu  
-   - Chuẩn hóa giá trị số  
+   - Kiểm tra và xử lý giá trị thiếu  
    - Mã hóa biến phân loại  
+   - Chuẩn hóa dữ liệu số  
 
-2. **Phân tích mô tả**
-   - Thống kê cơ bản theo giới tính, tuổi  
-   - Biểu đồ phân phối các đặc điểm tính cách  
+2. **Phân tích khám phá (EDA)**
+   - Phân phối điểm số các đặc điểm tính cách  
    - Heatmap ma trận tương quan  
+   - So sánh theo nhóm tính cách  
 
-3. **Phân tích nâng cao**
-   - PCA (Principal Component Analysis) để giảm chiều dữ liệu  
-   - Trực quan hóa phân cụm tính cách  
+3. **Giảm chiều dữ liệu**
+   - **PCA (Principal Component Analysis)** để rút gọn và trực quan hóa  
 
-4. **Xây dựng mô hình Machine Learning**
+4. **Xây dựng mô hình**
    - Decision Tree  
    - Random Forest  
    - Logistic Regression  
-   - KNN (k-Nearest Neighbors)  
-   - SVM (Support Vector Machine)  
+   - k-Nearest Neighbors (KNN)  
+   - Support Vector Machine (SVM)  
 
 5. **Đánh giá mô hình**
    - Accuracy, Precision, Recall, F1-score  
-   - So sánh hiệu quả các thuật toán  
+   - Ma trận nhầm lẫn (Confusion Matrix)  
 
 ---
 
-## 📈 Một số kết quả nổi bật
-- Tương quan mạnh giữa **Extraversion** và **Agreeableness**.  
-- Nhóm **Introvert** có điểm trung bình thấp hơn ở các đặc điểm hướng ngoại và cởi mở.  
-- Mô hình **Random Forest** đạt độ chính xác cao nhất (≈ 85%).  
-- PCA cho thấy dữ liệu có thể rút gọn thành **2–3 thành phần chính**.  
+## 📈 Kết quả chính
+- **Extraversion** và **Agreeableness** có tương quan mạnh nhất  
+- Nhóm **Introvert** có điểm trung bình thấp hơn ở **Extraversion** và **Openness**  
+- **Random Forest** cho kết quả tốt nhất (~85% accuracy)  
+- PCA cho thấy dữ liệu có thể rút gọn còn **2–3 thành phần chính**  
 
 ---
 
 ## 🚀 Công nghệ sử dụng
-- **Ngôn ngữ**: Python  
-- **Thư viện chính**:  
-  - `pandas`, `numpy` (xử lý dữ liệu)  
-  - `matplotlib`, `seaborn` (trực quan hóa)  
-  - `scikit-learn` (thuật toán ML, PCA, đánh giá mô hình)
+- **Ngôn ngữ:** R  
+- **Thư viện chính:**  
+  - `dplyr`, `tidyr` – xử lý dữ liệu  
+  - `ggplot2`, `corrplot` – trực quan hóa  
+  - `psych`, `factoextra` – PCA, phân tích nhân tố  
+  - `caret`, `randomForest`, `e1071`, `class` – mô hình học máy  
 
 ---
 
-## 📊 Minh họa
-- Biểu đồ phân phối Extraversion, Agreeableness  
-- Heatmap tương quan giữa các đặc điểm tính cách  
-- PCA Biplot  
-- Confusion Matrix các mô hình  
+## 📊 Trực quan hóa
+- Biểu đồ phân phối các đặc điểm tính cách  
+- Heatmap tương quan  
+- Biểu đồ PCA (biplot)  
+- Ma trận nhầm lẫn của các mô hình  
 
 ---
 
-## 📜 Kết luận
-- Các đặc điểm tính cách có sự liên quan chặt chẽ và ảnh hưởng trực tiếp đến phân loại nhóm tính cách.  
-- **Random Forest** cho kết quả tốt nhất trong phân loại.  
-- PCA và trực quan hóa hỗ trợ rất nhiều trong việc hiểu cấu trúc dữ liệu.  
-
----
-
-## 📁 Tài liệu
-- `personality_synthetic_dataset.csv`: Dữ liệu gốc  
-- `Personality-analysis.pdf`: Báo cáo phân tích chi tiết  
-- `Personality-analysis.Rmd`: Notebook xử lý và huấn luyện mô hình
+## 📁 Cấu trúc repo
+- `personality_synthetic_dataset.csv` – dữ liệu gốc  
+- `Personality-analysis.Rmd` – code xử lý và mô hình  
+- `Personality-analysis.pdf` – báo cáo chi tiết  
 
 ---
 
 ## 👨‍💻 Tác giả
-Dự án được thực hiện bởi [Trần Đăng Khôi](www.linkedin.com/in/trandangkhoi184).  
-Mục đích: Học tập và nghiên cứu về **Phân tích dữ liệu & Học máy trong tâm lý học**.
+Thực hiện bởi Trần Dăng Khôi  
+Mục đích: Học tập và nghiên cứu trong lĩnh vực **Khoa học dữ liệu & Tâm lý học với R**.
