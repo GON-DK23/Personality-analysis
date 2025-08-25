@@ -84,7 +84,7 @@ Bộ dữ liệu gồm nhiều biến liên quan đến đặc điểm cá nhân
 ---
 
 ## 📁 Tài liệu
-- `Personality.csv`: Dữ liệu gốc  
+- `personality_synthetic_dataset.csv`: Dữ liệu gốc  
 - `Personality-analysis.pdf`: Báo cáo phân tích chi tiết  
 - `Personality-analysis.Rmd`: Notebook xử lý và huấn luyện mô hình
 
