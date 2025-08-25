@@ -91,5 +91,5 @@ Bộ dữ liệu gồm nhiều biến liên quan đến đặc điểm cá nhân
 ---
 
 ## 👨‍💻 Tác giả
-Dự án được thực hiện bởi [Trần Đăng Khôi].  
+Dự án được thực hiện bởi [Trần Đăng Khôi](www.linkedin.com/in/trandangkhoi184).  
 Mục đích: Học tập và nghiên cứu về **Phân tích dữ liệu & Học máy trong tâm lý học**.
